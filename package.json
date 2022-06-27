@@ -1,0 +1,27 @@
+{
+  "name": "atividade_avaliativa_biblioteca_kenzo_sato",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kenzohfs/atividade_avaliativa_biblioteca_Kenzo_Sato.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Kenzohfs/atividade_avaliativa_biblioteca_Kenzo_Sato/issues"
+  },
+  "homepage": "https://github.com/Kenzohfs/atividade_avaliativa_biblioteca_Kenzo_Sato#readme",
+  "dependencies": {
+    "express": "^4.18.1",
+    "firebase": "^9.8.4",
+    "firebase-admin": "^11.0.0",
+    "nodemon": "^2.0.18"
+  }
+}

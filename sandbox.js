@@ -49,9 +49,15 @@ const crud = require("./crud");
 
 async function salvarDado() {
     console.log("ta passando aq");
-    const savedData = await crud.save("Pessoas", '12345678901',
+    const savedData = await crud.save("Clientes", '123456',
         { nome: "teste2", idade: 23 });
     console.log(savedData);
 }
 
-salvarDado();
+async function buscarDados(nomeTabela) {
+    const dados = await crud.get("Clientes")
+    console.log(dados);
+}
+
+// salvarDado();
+buscarDados("Clientes");

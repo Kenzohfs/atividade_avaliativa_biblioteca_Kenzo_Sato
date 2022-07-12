@@ -87,3 +87,5 @@ module.exports = {
     getById,
     remove
 }
+
+//trocar todos as chaves primárias que não são id para id

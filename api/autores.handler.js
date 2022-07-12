@@ -5,9 +5,7 @@ async function buscarAutores() {
 }
 
 function cadastrarAutor(autor) {
-    const id = autor.cpf;
-    delete autor.cpf;
-    return crud.save("Autores", id, autor);
+    return crud.save("Autores", null, autor);
 }
 
 module.exports = {

@@ -5,9 +5,7 @@ async function buscarClientes() {
 }
 
 async function cadastrarCliente(cliente) {
-    const id = cliente.cpf;
-    delete cliente.cpf;
-    return crud.save("Clientes", id, cliente);
+    return crud.save("Clientes", null, cliente);
 }
 
 module.exports = {

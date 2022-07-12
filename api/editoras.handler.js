@@ -5,7 +5,7 @@ async function buscarEditoras() {
 }
 
 async function cadastrarEditora(editora) {
-    return crud.save("Editoras", editora.id, editora);
+    return crud.save("Editoras", null, editora);
 }
 
 module.exports = {

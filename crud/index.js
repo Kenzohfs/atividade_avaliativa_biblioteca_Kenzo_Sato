@@ -81,11 +81,17 @@ async function remove(nomeTabela, id) {
     }
 }
 
+async function returnSelect(tableName, dataName, data) {
+    const dbRef = await db.collection(tableName);
+    const linhaRef = await dbRef.where(dataName, '==', data);
+    console.log("linharef>: ", linhaRef);
+    return linhaRef;
+}
+
 module.exports = {
     save,
     get,
     getById,
-    remove
+    remove,
+    returnSelect
 }
-
-//trocar todos as chaves primárias que não são id para id

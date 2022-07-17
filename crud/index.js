@@ -96,7 +96,6 @@ async function returnSelect(nomeTabela, nomeDado, dado) {
         lista.push(data);
     })
 
-    console.log("lista: ", lista);
     return lista;
 }
 

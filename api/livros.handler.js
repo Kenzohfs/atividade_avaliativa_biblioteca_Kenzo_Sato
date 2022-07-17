@@ -12,16 +12,12 @@ async function cadastrarLivro(livro) {
     //falta verificação se existe os autores para poder cadastrar o livro
 
     const livroSalvo = await crud.save("Livros", null, livro);
-    console.log("livrosalvo.id: ", livroSalvo.id);
-
-    // const autoresRef = db.collection('Autores');
 
     autores.forEach(async (autor) => {
-        // const linhaRef = autoresRef.where('cpf', '==', autor.id_autor);
-        // console.log("resultado select: ", linhaRef);
-        const linhaRef = await crud.returnSelect("Autores", "cpf", autor.cpf);
-        await livros_autores.cadastrarLivroAutor(linhaRef.id, livroSalvo.id);
+        const autorRef = await crud.returnSelect("Autores", "cpf", autor.cpf);
+        await livros_autores.cadastrarLivroAutor(autorRef[0].id, livroSalvo.id);
     });
+
     return livroSalvo;
 }
 

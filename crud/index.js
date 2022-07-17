@@ -19,7 +19,7 @@ const firebaseConfig = {
     storageBucket: "biblioteca-kenzo.appspot.com",
     messagingSenderId: "497858430979",
     appId: "1:497858430979:web:2d627fe84a6fb667ea6636"
-  };
+};
 
 const app = initializeApp(firebaseConfig);
 
@@ -67,7 +67,7 @@ async function getById(nomeTabela, id) {
     const docRef = doc(db, nomeTabela, id);
     const docSnap = await getDoc(docRef);
 
-    if(docSnap.exists()) {
+    if (docSnap.exists()) {
         return docSnap.data();
     } else {
         return new Error("Not found!");
@@ -83,9 +83,21 @@ async function remove(nomeTabela, id) {
 
 async function returnSelect(nomeTabela, nomeDado, dado) {
     const tableRef = collection(db, nomeTabela);
-    const queryRef = tableRef.where(nomeDado, '==', dado).get();
-    console.log("linharef: ", queryRef);
-    return linhaRef;
+    const q = query(tableRef, where(nomeDado, "==", dado));
+    const data = await getDocs(q)
+
+    const lista = [];
+
+    data.forEach((doc) => {
+        const data = {
+            ...doc.data(),
+            id: doc.id
+        }
+        lista.push(data);
+    })
+
+    console.log("lista: ", lista);
+    return lista;
 }
 
 module.exports = {

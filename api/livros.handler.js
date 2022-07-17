@@ -9,6 +9,8 @@ async function cadastrarLivro(livro) {
     const autores = livro.lista_autores;
     delete livro.lista_autores;
 
+    //falta verificação se existe os autores para poder cadastrar o livro
+
     const livroSalvo = await crud.save("Livros", null, livro);
     console.log("livrosalvo.id: ", livroSalvo.id);
 

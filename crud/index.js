@@ -81,10 +81,10 @@ async function remove(nomeTabela, id) {
     }
 }
 
-async function returnSelect(tableName, dataName, data) {
-    const dbRef = await db.collection(tableName);
-    const linhaRef = await dbRef.where(dataName, '==', data);
-    console.log("linharef>: ", linhaRef);
+async function returnSelect(nomeTabela, nomeDado, dado) {
+    const tableRef = collection(db, nomeTabela);
+    const queryRef = tableRef.where(nomeDado, '==', dado).get();
+    console.log("linharef: ", queryRef);
     return linhaRef;
 }
 

@@ -60,4 +60,5 @@ async function buscarDados(nomeTabela) {
 }
 
 // salvarDado();
-buscarDados("Clientes");
+// buscarDados("Clientes");
+crud.returnSelect("Autores", "cpf", "20");

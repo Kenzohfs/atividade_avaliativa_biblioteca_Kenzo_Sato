@@ -8,15 +8,19 @@ async function buscarLocacoes() {
 }
 
 async function cadastrarLocacao(locacao) {
-    const listaLivros = locacao.lista_livros;
-    delete locacao.lista_livros;
-
-    const cliente = await crud.returnSelect("Clientes", "cpf", locacao.clientes_cpf);
-
+    const clientes = await crud.returnSelect("Clientes", "cpf", locacao.clientes_cpf);
     delete locacao.clientes_cpf;
-    locacao.clientes_id = cliente[0].id;
+
+    if (await clienteTemLocacao(clientes[0])) {
+        return { erro: "Client already has a rent!" }
+    }
+    
+    locacao.clientes_id = clientes[0].id;
     locacao.data_locacao = serverTimestamp();
 
+    const listaLivros = locacao.lista_livros;
+    delete locacao.lista_livros;
+    
     const locacaoSalva = await crud.save("Locacoes", null, locacao);
 
     listaLivros.forEach(async livroIsbn => {
@@ -24,6 +28,16 @@ async function cadastrarLocacao(locacao) {
     });
     
     return locacaoSalva;
+}
+
+async function clienteTemLocacao(cliente) {
+    console.log("cliente: ", cliente)
+    const dados = await crud.returnSelect("Locacoes", "clientes_id", cliente.id);
+    console.log("dados locacoes: ", dados);
+    if (dados) {
+        return true;
+    } 
+    return false;
 }
 
 module.exports = {

@@ -7,16 +7,19 @@ async function buscarLivros() {
 
 async function cadastrarLivro(livro) {
     const autores = livro.lista_autores;
+    const editora = livro.editoras_nome;
+
     delete livro.lista_autores;
+    delete livro.editoras_nome;
 
-    //falta verificação se existe os autores para poder cadastrar o livro
+    /*
+        falta verificação se existe os autores
+        falta verificação se exite editora
+    */
 
+    livro.editoras_id = await buscarEditoraId(editora);
     const livroSalvo = await crud.save("Livros", null, livro);
-
-    autores.forEach(async (autor) => {
-        const autorRef = await crud.returnSelect("Autores", "cpf", autor.cpf);
-        await livros_autores.cadastrarLivroAutor(autorRef[0].id, livroSalvo.id);
-    });
+    await cadastrarLivroAutor(autores, livroSalvo.id);
 
     return livroSalvo;
 }
@@ -25,6 +28,18 @@ async function atualizarLivro(livro, locacoes_id) {
     const novoLivro = await crud.get("Livros", livro);
     novoLivro.locacoes_id = locacoes_id;
     await crud.save("Livros");
+}
+
+async function buscarEditoraId(editoraNome) {
+    const editoraDado = await crud.returnSelect("Editoras", "nome", editoraNome);
+    return editoraDado[0].id;
+}
+
+async function cadastrarLivroAutor(autores, idLivro) {
+    autores.forEach(async (autor) => {
+        const autorRef = await crud.returnSelect("Autores", "cpf", autor.cpf);
+        await livros_autores.cadastrarLivroAutor(autorRef[0].id, idLivro);
+    });
 }
 
 module.exports = {

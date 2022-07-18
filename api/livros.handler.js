@@ -24,10 +24,11 @@ async function cadastrarLivro(livro) {
     return livroSalvo;
 }
 
-async function atualizarLivro(livro, locacoes_id) {
-    const novoLivro = await crud.get("Livros", livro);
-    novoLivro.locacoes_id = locacoes_id;
-    await crud.save("Livros");
+async function atualizarLivro(livroIsbn, locacao_id) {
+    const livro = await crud.returnSelect("Livros", "isbn", livroIsbn);
+    
+    const livroAtualizado = await crud.save("Livros", livro[0].id, { ...livro[0], locacoes_id: locacao_id });
+    return livroAtualizado;
 }
 
 async function buscarEditoraId(editoraNome) {

@@ -61,4 +61,14 @@ async function buscarDados(nomeTabela) {
 
 // salvarDado();
 // buscarDados("Clientes");
-crud.returnSelect("Autores", "cpf", "20");
+// crud.returnSelect("Autores", "cpf", "20");
+
+// const locacoes = async => crud.get("Locacoes");
+async function locacoes() {
+    const dados = await crud.get("Locacoes");
+    return dados;
+}
+
+locacoes().then( e => {
+    console.log("a", e[0].data_locacao);
+})

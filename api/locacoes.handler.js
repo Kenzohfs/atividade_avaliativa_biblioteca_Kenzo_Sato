@@ -1,3 +1,5 @@
+const { serverTimestamp } = require('firebase/firestore/lite');
+
 const crud = require('../crud');
 const livros = require('./livros.handler');
 
@@ -6,15 +8,22 @@ async function buscarLocacoes() {
 }
 
 async function cadastrarLocacao(locacao) {
-    const listaLivros = locacao.listaLivros;
-    listaLivros.forEach(async livro => {
-        await livros.atualizarLivro(livro);
+    const listaLivros = locacao.lista_livros;
+    delete locacao.lista_livros;
+
+    const cliente = await crud.returnSelect("Clientes", "cpf", locacao.clientes_cpf);
+
+    delete locacao.clientes_cpf;
+    locacao.clientes_id = cliente[0].id;
+    locacao.data_locacao = serverTimestamp();
+
+    const locacaoSalva = await crud.save("Locacoes", null, locacao);
+
+    listaLivros.forEach(async livroIsbn => {
+        await livros.atualizarLivro(livroIsbn.isbn, locacaoSalva.id);
     });
-    delete locacao.listaLivros;
-    //Trocar para a data do firebase
-    //Talvez trocar o dado clientes_cpf do locações para uma chave secundária em clientes
-    locacao.data_locacao = new Date();
-    return crud.save("Locacoes", null, locacao);
+    
+    return locacaoSalva;
 }
 
 module.exports = {

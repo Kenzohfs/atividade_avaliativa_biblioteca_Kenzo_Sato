@@ -5,7 +5,7 @@ async function buscarLivrosAutores() {
 }
 
 async function cadastrarLivroAutor(idAutor, idLivro) {
-    const livro_autor = { idAutor, idLivro };
+    const livro_autor = { autores_id: idAutor, livros_id: idLivro };
     return await crud.save("Livros_Autores", null, livro_autor);
 }
 

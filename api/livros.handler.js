@@ -25,9 +25,13 @@ async function cadastrarLivro(livro) {
 }
 
 async function atualizarLivro(livroIsbn, locacao_id) {
-    const livro = await crud.returnSelect("Livros", "isbn", livroIsbn);
-    
-    const livroAtualizado = await crud.save("Livros", livro[0].id, { ...livro[0], locacoes_id: locacao_id });
+    const livros = await crud.returnSelect("Livros", "isbn", livroIsbn);
+
+    if (await livroAlugado(livros[0])) {
+        return { erro: `O livro ${livros.titulo} já foi alugado!` }
+    }
+
+    const livroAtualizado = await crud.save("Livros", livros[0].id, { ...livros[0], locacoes_id: locacao_id });
     return livroAtualizado;
 }
 
@@ -41,6 +45,12 @@ async function cadastrarLivroAutor(autores, idLivro) {
         const autorRef = await crud.returnSelect("Autores", "cpf", autor.cpf);
         await livros_autores.cadastrarLivroAutor(autorRef[0].id, idLivro);
     });
+}
+
+async function livroAlugado(livro) {
+    if (livro.locacoes_id)
+        return true;
+    return false;
 }
 
 module.exports = {

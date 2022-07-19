@@ -56,5 +56,6 @@ async function livroAlugado(livro) {
 module.exports = {
     buscarLivros,
     cadastrarLivro,
-    atualizarLivro
+    atualizarLivro,
+    livroAlugado
 }

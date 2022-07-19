@@ -9,6 +9,10 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
     res.json(await autoresHandler.cadastrarAutor(req.body));
+});
+
+router.delete("/", async (req, res) => {
+    res.json(await autoresHandler.deletarAutor(req.body.cpf));
 })
 
 module.exports = router;

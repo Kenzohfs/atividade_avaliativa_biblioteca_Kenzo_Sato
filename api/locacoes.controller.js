@@ -11,4 +11,8 @@ router.post("/", async (req, res) => {
     res.json(await locacoesHandler.cadastrarLocacao(req.body));
 })
 
+router.delete("/", async (req, res) => {
+    res.json(await locacoesHandler.deletarLocacao(req.body));
+})
+
 module.exports = router;

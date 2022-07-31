@@ -14,7 +14,7 @@ async function cadastrarLivro(livro) {
 
     /*
         falta verificação se existe os autores
-        falta verificação se exite editora
+        falta verificação se existe editora
     */
 
     livro.editoras_id = await buscarEditoraId(editora);

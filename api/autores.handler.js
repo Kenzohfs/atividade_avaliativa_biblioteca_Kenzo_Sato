@@ -14,8 +14,16 @@ async function deletarAutor(autorCpf) {
     return await crud.remove("Autores", autor[0].id);
 }
 
+async function atualizarAutor(autorCpf, autorAtualizado) {
+    const autor = await crud.returnSelect("Autores", "cpf", autorCpf);
+    autorAtualizado.id = autor[0].id;
+    autorAtualizado.cpf = autor[0].cpf;
+    return await crud.save("Autores", autorAtualizado.id, autorAtualizado);
+}
+
 module.exports = {
     buscarAutores,
     cadastrarAutor,
-    deletarAutor
+    deletarAutor,
+    atualizarAutor
 }

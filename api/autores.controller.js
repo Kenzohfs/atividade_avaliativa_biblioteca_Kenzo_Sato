@@ -11,8 +11,12 @@ router.post("/", async (req, res) => {
     res.json(await autoresHandler.cadastrarAutor(req.body));
 });
 
-router.delete("/", async (req, res) => {
-    res.json(await autoresHandler.deletarAutor(req.body.cpf));
+router.delete("/:cpf", async (req, res) => {
+    res.json(await autoresHandler.deletarAutor(req.params.cpf));
+})
+
+router.put("/:cpf", async(req, res) => {
+    res.json(await autoresHandler.atualizarAutor(req.params.cpf, req.body));
 })
 
 module.exports = router;

@@ -31,7 +31,8 @@ async function atualizarLivro(livroIsbn, locacao_id) {
         return { erro: `O livro ${livros.titulo} já foi alugado!` }
     }
 
-    const livroAtualizado = await crud.save("Livros", livros[0].id, { ...livros[0], locacoes_id: locacao_id });
+    const livroAtualizado = await crud.save("Livros", livros[0].id, 
+        { ...livros[0], locacoes_id: locacao_id });
     return livroAtualizado;
 }
 

@@ -1,4 +1,4 @@
-const crud = require('../crud');
+const crud = require('../../crud');
 
 async function buscarAutores() {
     return crud.get("Autores");

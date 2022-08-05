@@ -1,7 +1,7 @@
 const { serverTimestamp } = require('firebase/firestore/lite');
 
-const crud = require('../crud');
-const livros = require('./livros.handler');
+const crud = require('../../crud');
+const livros = require('../livros/livros.handler');
 
 async function buscarLocacoes() {
     return crud.get("Locacoes");

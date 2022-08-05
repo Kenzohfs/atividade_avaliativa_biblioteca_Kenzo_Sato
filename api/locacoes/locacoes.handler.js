@@ -16,11 +16,11 @@ async function cadastrarLocacao(locacao) {
 
     locacao.clientes_id = clientes[0].id;
     locacao.data_locacao = serverTimestamp();
+    locacao.status = "ABERTO";
 
     const listaLivros = locacao.lista_livros;
     delete locacao.lista_livros;
 
-    //trocar livro.locacoes_id para sempre ter no livro, só trocar o valor
     const livrosAlugaveis = await veriricarLivrosAlugaveis(listaLivros);
 
     if (livrosAlugaveis.length == 0)
@@ -28,18 +28,21 @@ async function cadastrarLocacao(locacao) {
 
     const locacaoSalva = await crud.save("Locacoes", null, locacao);
 
-    for (let livroIsbn of livrosAlugaveis)
-        await livros.atualizarLivro(livroIsbn.isbn, locacaoSalva.id);
+    for (let livro of livrosAlugaveis)
+        await crud.save("Livros_Locacoes", null, { livros_id: livro.id, locacoes_id: locacaoSalva.id });
 
     return locacaoSalva;
 }
 
 async function clienteTemLocacao(cliente) {
     console.log("cliente: ", cliente)
-    const dados = await crud.returnSelect("Locacoes", "clientes_id", cliente.id);
-    console.log("dados locacoes: ", dados);
-    if (dados.length > 0)
-        return true;
+    const locacoes = await crud.returnSelect("Locacoes", "clientes_id", cliente.id);
+    console.log("dados locacoes: ", locacoes);
+    for (let locacao of locacoes) {
+        if (locacao.status == "ABERTO") {
+            return true;
+        }
+    }
     return false;
 }
 
@@ -47,10 +50,25 @@ async function veriricarLivrosAlugaveis(listaLivros) {
     const livrosAlugaveis = [];
 
     for (let livroIsbn of listaLivros) {
-        let livros = await crud.returnSelect("Livros", "isbn", livroIsbn.isbn);
-        console.log(!livros[0].locacoes_id)
-        if (!livros[0].locacoes_id) {
-            livrosAlugaveis.push(livros[0]);
+        const livro = await crud.returnSelect("Livros", "isbn", livroIsbn.isbn);
+        console.log("livro: ", livro);
+
+        const livros_locacoes = await crud.returnSelect("Livros_Locacoes", "livros_id", livro[0].id);
+        console.log("livros_locacoes: ", livros_locacoes);
+
+        let livroEstaAlugado = false;
+
+        for (let livro_locacao of livros_locacoes) {
+            const locacao = await crud.getById("Locacoes", livro_locacao.locacoes_id);
+            console.log("livro_locacao.locacoes_id", livro_locacao.locacoes_id);
+            console.log("locacao: ", locacao);
+
+            if (locacao.status == "ABERTO")
+                livroEstaAlugado = true;
+        }
+
+        if (!livroEstaAlugado) {
+            livrosAlugaveis.push(livro[0]);
         }
     }
 

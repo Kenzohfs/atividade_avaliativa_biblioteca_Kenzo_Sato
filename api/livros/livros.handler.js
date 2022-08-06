@@ -2,7 +2,12 @@ const crud = require('../../crud');
 const livros_autores = require('../livros_autores/livros_autores.handler');
 
 async function buscarLivros() {
-    return crud.get("Livros");
+    return await crud.get("Livros");
+}
+
+async function buscarLivro(isbn) {
+    const livro = await crud.returnSelect("Livros", "isbn", isbn);
+    return await crud.getById("Livros", livro[0].id);
 }
 
 async function cadastrarLivro(livro) {
@@ -18,23 +23,46 @@ async function cadastrarLivro(livro) {
     */
 
     livro.editoras_id = await buscarEditoraId(editora);
-    const livroSalvo = await crud.save("Livros", null, livro);
-    await cadastrarLivroAutor(autores, livroSalvo.id);
+    let livroSalvo;
 
+    if (livro.id) {
+        let livroId = livro.id;
+        delete livro.id;
+
+        livroSalvo = await crud.save("Livros", livroId, livro)
+    } else {
+        livroSalvo = await crud.save("Livros", null, livro);
+    }
+    await cadastrarLivroAutor(autores, livroSalvo.id);
     return livroSalvo;
 }
 
-async function atualizarLivro(livroIsbn, locacao_id) {
-    const livros = await crud.returnSelect("Livros", "isbn", livroIsbn);
+// Função de atualizar livro quando no livro ainda tinha status (se ele ainda estava em uma locação)
+// async function atualizarLivro(livroIsbn, locacao_id) {
+//     const livros = await crud.returnSelect("Livros", "isbn", livroIsbn);
 
-    if (await livroAlugado(livros[0])) {
-        return { erro: `O livro ${livros.titulo} já foi alugado!` }
-    }
+//     if (await livroAlugado(livros[0])) {
+//         return { erro: `O livro ${livros.titulo} já foi alugado!` }
+//     }
 
-    const livroAtualizado = await crud.save("Livros", livros[0].id, 
-        { ...livros[0], locacoes_id: locacao_id });
+//     const livroAtualizado = await crud.save("Livros", livros[0].id, 
+//         { ...livros[0], locacoes_id: locacao_id });
+//     return livroAtualizado;
+// }
+
+//function atualizar meio estranha, falta testes
+async function atualizarLivro(isbn, livro) {
+    const livros = await crud.returnSelect("Livros", "isbn", isbn);
+
+    livro.id = livros[0].id;
+    livro.isbn = livros[0].isbn;
+
+    await deletarLivro(isbn);
+    const livroAtualizado = await cadastrarLivro(livro);
+
     return livroAtualizado;
 }
+
 
 async function buscarEditoraId(editoraNome) {
     const editoraDado = await crud.returnSelect("Editoras", "nome", editoraNome);
@@ -48,15 +76,22 @@ async function cadastrarLivroAutor(autores, idLivro) {
     });
 }
 
-async function livroAlugado(livro) {
-    if (livro.locacoes_id)
-        return true;
-    return false;
+async function deletarLivro(livroIsbn) {
+    const livroObj = await crud.returnSelect("Livros", "isbn", livroIsbn);
+    console.log(livroObj)
+    crud.remove("Livros", livroObj[0].id);
+
+    const listaAutores = await crud.returnSelect("Livros_Autores", "livro_id", livroObj[0].id);
+
+    for (let autor of listaAutores) {
+        await crud.remove("Livros_Autores", autor.id);
+    }
 }
 
 module.exports = {
     buscarLivros,
+    buscarLivro,
     cadastrarLivro,
     atualizarLivro,
-    livroAlugado
+    deletarLivro
 }

@@ -1,7 +1,6 @@
 const { serverTimestamp } = require('firebase/firestore/lite');
 
 const crud = require('../../crud');
-const livros = require('../livros/livros.handler');
 
 async function buscarLocacoes() {
     return crud.get("Locacoes");
@@ -53,6 +52,7 @@ async function veriricarLivrosAlugaveis(listaLivros) {
         const livro = await crud.returnSelect("Livros", "isbn", livroIsbn.isbn);
         console.log("livro: ", livro);
 
+        console.log("Livroid: ", livro[0].id)
         const livros_locacoes = await crud.returnSelect("Livros_Locacoes", "livros_id", livro[0].id);
         console.log("livros_locacoes: ", livros_locacoes);
 

@@ -2,6 +2,8 @@ const { serverTimestamp } = require('firebase/firestore/lite');
 
 const crud = require('../../crud');
 
+const statusAberto = "ABERTO";
+
 async function buscarLocacoes() {
     return crud.get("Locacoes");
 }
@@ -15,7 +17,7 @@ async function cadastrarLocacao(locacao) {
 
     locacao.clientes_id = clientes[0].id;
     locacao.data_locacao = serverTimestamp();
-    locacao.status = "ABERTO";
+    locacao.status = statusAberto;
 
     const listaLivros = locacao.lista_livros;
     delete locacao.lista_livros;
@@ -38,7 +40,7 @@ async function clienteTemLocacao(cliente) {
     const locacoes = await crud.returnSelect("Locacoes", "clientes_id", cliente.id);
     // console.log("dados locacoes: ", locacoes);
     for (let locacao of locacoes) {
-        if (locacao.status == "ABERTO") {
+        if (locacao.status == statusAberto ) {
             console.log("if true locações")
             return true;
         }
@@ -75,7 +77,7 @@ async function livroEstaAlugado(livros_locacoes) {
         console.log("livro_locacao.locacoes_id", livro_locacao.locacoes_id);
         console.log("locacao: ", locacao);
 
-        if (locacao.status == "ABERTO")
+        if (locacao.status == statusAberto )
             livroEstaAlugado = true;
     }
 

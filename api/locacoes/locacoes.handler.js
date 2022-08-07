@@ -15,7 +15,18 @@ async function buscarLocacoes() {
 }
 
 async function buscarLocacao(id) {
-    return {...await crud.getById(tabelaLocacoes, id), id};
+    const locacao = await crud.getById(tabelaLocacoes, id);
+    const livrosLocacoesDados = await crud.returnSelect(tabelaLivrosLocacoes, "locacoes_id", id);
+    const cliente = await crud.getById(tabelaClientes, locacao.clientes_id);
+
+    delete locacao.clientes_id;
+    
+    const livros = [];
+
+    for (let livroLocacaoDado of livrosLocacoesDados)
+        livros.push(await crud.getById(tabelaLivros, livroLocacaoDado.livros_id));
+
+    return {id, cliente, ...locacao, livros};
 }
 
 async function cadastrarLocacao(locacao) {

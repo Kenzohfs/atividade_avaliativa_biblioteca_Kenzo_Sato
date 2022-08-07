@@ -12,7 +12,17 @@ async function buscarLivros() {
 
 async function buscarLivro(isbn) {
     const livro = await crud.returnSelect(tabelaLivros, "isbn", isbn);
-    return ({ ...await crud.getById(tabelaLivros, livro[0].id), id: livro[0].id })
+    const livrosAutores = await crud.returnSelect(tabelaLivrosAutores, "livros_id", livro[0].id);
+    const editora = await crud.getById(tabelaEditoras, livro[0].editoras_id);
+    const dadosLivro = await crud.getById(tabelaLivros, livro[0].id)
+
+    delete dadosLivro.editoras_id;
+
+    const autores = []
+    for (let livroAutor of livrosAutores)
+        autores.push(await crud.getById(tabelaAutores, livroAutor.autores_id));
+
+    return { id: livro[0].id, ...dadosLivro, editora, autores };
 }
 
 async function cadastrarLivro(livro) {

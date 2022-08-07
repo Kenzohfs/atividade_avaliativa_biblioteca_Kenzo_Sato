@@ -1,15 +1,24 @@
 const crud = require('../../crud');
 
+const tabelaLivrosAutores = "Livros_Autores";
+
 async function buscarLivrosAutores() {
-    return await crud.get("Livros_Autores");
+    return await crud.get(tabelaLivrosAutores);
 }
 
 async function cadastrarLivroAutor(idAutor, idLivro) {
     const livro_autor = { autores_id: idAutor, livros_id: idLivro };
-    return await crud.save("Livros_Autores", null, livro_autor);
+    return await crud.save(tabelaLivrosAutores, null, livro_autor);
+}
+
+async function deletarLivroAutor(id) {
+    const livroAutorDeletado = await crud.remove(tabelaLivrosAutores, id);
+
+    return livroAutorDeletado;
 }
 
 module.exports = {
     buscarLivrosAutores,
-    cadastrarLivroAutor
+    cadastrarLivroAutor,
+    deletarLivroAutor
 }

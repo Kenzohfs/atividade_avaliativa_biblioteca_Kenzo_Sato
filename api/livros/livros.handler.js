@@ -35,20 +35,6 @@ async function fazerNovoLivro(livro) {
     return livro;
 }
 
-// Função de atualizar livro quando no livro ainda tinha status (se ele ainda estava em uma locação)
-// async function atualizarLivro(livroIsbn, locacao_id) {
-//     const livros = await crud.returnSelect("Livros", "isbn", livroIsbn);
-
-//     if (await livroAlugado(livros[0])) {
-//         return { erro: `O livro ${livros.titulo} já foi alugado!` }
-//     }
-
-//     const livroAtualizado = await crud.save("Livros", livros[0].id, 
-//         { ...livros[0], locacoes_id: locacao_id });
-//     return livroAtualizado;
-// }
-
-//function atualizar meio estranha, falta testes
 async function atualizarLivro(isbn, livro) {
     const livros = await crud.returnSelect("Livros", "isbn", isbn);
 
@@ -56,6 +42,10 @@ async function atualizarLivro(isbn, livro) {
     const autores = livro.lista_autores;
     const novoLivro = await fazerNovoLivro(livro);
     const livroSalvo = await crud.save("Livros", livros[0].id, novoLivro);
+
+    const livrosAutores = await crud.returnSelect("Livros_Autores", "livros_id", livros[0].id);
+    for (let livroAutor of livrosAutores)
+        await livros_autores.deletarLivroAutor(livroAutor.id)
 
     await cadastrarLivroAutor(autores, livroSalvo.id);
 

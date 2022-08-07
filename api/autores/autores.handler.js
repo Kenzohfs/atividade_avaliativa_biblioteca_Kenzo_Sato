@@ -1,28 +1,50 @@
 const crud = require('../../crud');
 
+const tabelaAutores = "Autores";
+
 async function buscarAutores() {
-    return crud.get("Autores");
+    return await crud.get(tabelaAutores);
+}
+
+async function buscarAutor(cpf) {
+    const autores = await crud.returnSelect(tabelaAutores, "cpf", cpf); 
+    return autores[0];
 }
 
 async function cadastrarAutor(autor) {
-    return crud.save("Autores", null, autor);
+    if (!(autor.cpf && autor.nome && autor.sobrenome))
+        return { erro: `Para cadastrar um autor é preciso que tenha um CPF, nome e sobrenome!` }
+        
+    if (await cpfValido(autor.cpf))
+        return await crud.save(tabelaAutores, null, autor);
+    return { erro: `CPF inválido!` }
+}
+
+async function cpfValido(cpf) {
+    const autores = await crud.returnSelect(tabelaAutores, "cpf", cpf);
+
+    if (autores.length == 0) 
+        return true;
+    return false;
 }
 
 async function deletarAutor(autorCpf) {
-    const autor = await crud.returnSelect("Autores", "cpf", autorCpf);
-    console.log("autor ", autor);
-    return await crud.remove("Autores", autor[0].id);
+    const autor = await crud.returnSelect(tabelaAutores, "cpf", autorCpf);
+    return await crud.remove(tabelaAutores, autor[0].id);
 }
 
 async function atualizarAutor(autorCpf, autorAtualizado) {
-    const autor = await crud.returnSelect("Autores", "cpf", autorCpf);
-    autorAtualizado.id = autor[0].id;
-    autorAtualizado.cpf = autor[0].cpf;
-    return await crud.save("Autores", autorAtualizado.id, autorAtualizado);
+    const autores = await crud.returnSelect(tabelaAutores, "cpf", autorCpf);
+    const id = autores[0].id;
+
+    autorAtualizado.cpf = autores[0].cpf;
+
+    return await crud.save(tabelaAutores, id, autorAtualizado);
 }
 
 module.exports = {
     buscarAutores,
+    buscarAutor,
     cadastrarAutor,
     deletarAutor,
     atualizarAutor

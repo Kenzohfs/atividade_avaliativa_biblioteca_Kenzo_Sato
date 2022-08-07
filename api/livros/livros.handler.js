@@ -13,10 +13,7 @@ async function buscarLivro(isbn) {
 async function cadastrarLivro(livro) {
     const autores = livro.lista_autores;
     const novoLivro = await fazerNovoLivro(livro);
-    /*
-        falta verificação se existe os autores
-        falta verificação se existe editora
-    */
+
     const livroSalvo = await crud.save("Livros", null, novoLivro);
 
     await cadastrarLivroAutor(autores, livroSalvo.id);
@@ -25,10 +22,10 @@ async function cadastrarLivro(livro) {
 }
 
 async function fazerNovoLivro(livro) {
-    const editora = livro.editoras_nome;
+    const editora = livro.editoras_cnpj;
 
     delete livro.lista_autores;
-    delete livro.editoras_nome;
+    delete livro.editoras_cnpj;
 
     livro.editoras_id = await buscarEditoraId(editora);
 
@@ -52,9 +49,8 @@ async function atualizarLivro(isbn, livro) {
     return livroSalvo;
 }
 
-
-async function buscarEditoraId(editoraNome) {
-    const editoraDado = await crud.returnSelect("Editoras", "nome", editoraNome);
+async function buscarEditoraId(editoraCnpj) {
+    const editoraDado = await crud.returnSelect("Editoras", "cnpj", editoraCnpj);
     return editoraDado[0].id;
 }
 
@@ -67,11 +63,9 @@ async function cadastrarLivroAutor(autores, idLivro) {
 
 async function deletarLivro(livroIsbn) {
     const livro = await crud.returnSelect("Livros", "isbn", livroIsbn);
-    console.log(livro);
     const livroDeletado = await crud.remove("Livros", livro[0].id);
 
     const listaAutores = await crud.returnSelect("Livros_Autores", "livros_id", livro[0].id);
-    console.log("listaautores: ", listaAutores);
 
     for (let autor of listaAutores) {
         await crud.remove("Livros_Autores", autor.id);

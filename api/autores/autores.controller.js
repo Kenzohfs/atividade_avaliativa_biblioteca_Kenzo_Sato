@@ -7,6 +7,10 @@ router.get("/", async (req, res) => {
     res.json(await autoresHandler.buscarAutores());
 });
 
+router.get("/:cpf", async (req, res) => {
+    res.json(await autoresHandler.buscarAutor(req.params.cpf));
+});
+
 router.post("/", async (req, res) => {
     res.json(await autoresHandler.cadastrarAutor(req.body));
 });

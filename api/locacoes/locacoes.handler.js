@@ -38,7 +38,7 @@ async function cadastrarLocacao(locacao) {
     const locacaoSalva = await crud.save(tabelaLocacoes, null, locacao);
 
     for (let livro of livrosAlugaveis)
-        await crud.save("Livros_Locacoes", null, { livros_id: livro.id, locacoes_id: locacaoSalva.id });
+        await crud.save(tabelaLivrosLocacoes, null, { livros_id: livro.id, locacoes_id: locacaoSalva.id });
 
     return locacaoSalva;
 }
@@ -93,7 +93,7 @@ async function deletarLocacao(id) {
     const livros_locacoes = await crud.returnSelect(tabelaLivrosLocacoes, "locacoes_id", id);
 
     for (let livro_locacao of livros_locacoes) 
-        await crud.remove("Livros_Locacoes", livro_locacao.id);
+        await crud.remove(tabelaLivrosLocacoes, livro_locacao.id);
 
     return await crud.remove(tabelaLocacoes, id);
 }

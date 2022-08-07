@@ -1,6 +1,7 @@
 const { serverTimestamp } = require('firebase/firestore/lite');
 
 const crud = require('../../crud');
+const livrosLocacoes = require("../livros_locacoes/livros_locacoes.handler")
 
 const statusAberto = "ABERTO";
 const tabelaLocacoes = "Locacoes";
@@ -8,12 +9,13 @@ const tabelaClientes = "Clientes"
 const tabelaLivrosLocacoes = "Livros_Locacoes";
 const tabelaLivros = "Livros";
 
+
 async function buscarLocacoes() {
     return await crud.get(tabelaLocacoes);
 }
 
 async function buscarLocacao(id) {
-    return {...(await crud.getById(tabelaLocacoes, id)), id};
+    return {...await crud.getById(tabelaLocacoes, id), id};
 }
 
 async function cadastrarLocacao(locacao) {
@@ -52,6 +54,7 @@ async function atualizarLocacao(id, status) {
 
 async function clienteTemLocacao(cliente) {
     const locacoes = await crud.returnSelect(tabelaLocacoes, "clientes_id", cliente.id);
+    
     for (let locacao of locacoes) {
         if (locacao.status == statusAberto ) {
             return true;
@@ -93,7 +96,7 @@ async function deletarLocacao(id) {
     const livros_locacoes = await crud.returnSelect(tabelaLivrosLocacoes, "locacoes_id", id);
 
     for (let livro_locacao of livros_locacoes) 
-        await crud.remove(tabelaLivrosLocacoes, livro_locacao.id);
+        await livrosLocacoes.deletarLivroLocacao(livro_locacao.id);
 
     return await crud.remove(tabelaLocacoes, id);
 }

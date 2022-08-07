@@ -3,7 +3,7 @@ const crud = require('../../crud');
 const tabelaClientes = "Clientes";
 
 async function buscarClientes() {
-    return crud.get("Clientes");
+    return crud.get(tabelaClientes);
 }
 
 async function buscarCliente(cpf) {

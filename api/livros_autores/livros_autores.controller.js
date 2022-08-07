@@ -11,8 +11,4 @@ router.get("/:id", async (req, res) => {
     res.json(await livrosAutoresHandler.buscarLivroAutor(req.params.id));
 });
 
-router.delete("/:id", async (req, res) => {
-    res.json(await livrosAutoresHandler.deletarLivroAutor(req.params.id));
-});
-
 module.exports = router;

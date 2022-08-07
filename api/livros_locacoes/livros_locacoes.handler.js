@@ -7,7 +7,7 @@ async function buscarLivrosLocacoes() {
 }
 
 async function buscarLivroLocacao(id) {
-    return { ...await crud.getById(tabelaLivrosLocacoes, id), id};
+    return { ...await crud.getById(tabelaLivrosLocacoes, id), id };
 }
 
 async function cadastrarLivroLocacao(idLocacao, idLivro) {

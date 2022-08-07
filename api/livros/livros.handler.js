@@ -1,20 +1,25 @@
 const crud = require('../../crud');
 const livros_autores = require('../livros_autores/livros_autores.handler');
 
+const tabelaLivros = "Livros"
+const tabelaLivrosAutores = "Livros_Autores"
+const tabelaAutores = "Autores";
+const tabelaEditoras = "Editoras";
+
 async function buscarLivros() {
-    return await crud.get("Livros");
+    return await crud.get(tabelaLivros);
 }
 
 async function buscarLivro(isbn) {
-    const livro = await crud.returnSelect("Livros", "isbn", isbn);
-    return ({ ...await crud.getById("Livros", livro[0].id), id: livro[0].id })
+    const livro = await crud.returnSelect(tabelaLivros, "isbn", isbn);
+    return ({ ...await crud.getById(tabelaLivros, livro[0].id), id: livro[0].id })
 }
 
 async function cadastrarLivro(livro) {
     const autores = livro.lista_autores;
     const novoLivro = await fazerNovoLivro(livro);
 
-    const livroSalvo = await crud.save("Livros", null, novoLivro);
+    const livroSalvo = await crud.save(tabelaLivros, null, novoLivro);
 
     await cadastrarLivroAutor(autores, livroSalvo.id);
 
@@ -33,14 +38,14 @@ async function fazerNovoLivro(livro) {
 }
 
 async function atualizarLivro(isbn, livro) {
-    const livros = await crud.returnSelect("Livros", "isbn", isbn);
+    const livros = await crud.returnSelect(tabelaLivros, "isbn", isbn);
 
     livro.isbn = isbn;
     const autores = livro.lista_autores;
     const novoLivro = await fazerNovoLivro(livro);
-    const livroSalvo = await crud.save("Livros", livros[0].id, novoLivro);
+    const livroSalvo = await crud.save(tabelaLivros, livros[0].id, novoLivro);
 
-    const livrosAutores = await crud.returnSelect("Livros_Autores", "livros_id", livros[0].id);
+    const livrosAutores = await crud.returnSelect(tabelaLivrosAutores, "livros_id", livros[0].id);
     for (let livroAutor of livrosAutores)
         await livros_autores.deletarLivroAutor(livroAutor.id)
 
@@ -50,25 +55,25 @@ async function atualizarLivro(isbn, livro) {
 }
 
 async function buscarEditoraId(editoraCnpj) {
-    const editoraDado = await crud.returnSelect("Editoras", "cnpj", editoraCnpj);
+    const editoraDado = await crud.returnSelect(tabelaEditoras, "cnpj", editoraCnpj);
     return editoraDado[0].id;
 }
 
 async function cadastrarLivroAutor(autores, idLivro) {
     for (let autor of autores) {
-        const autorRef = await crud.returnSelect("Autores", "cpf", autor.cpf);
+        const autorRef = await crud.returnSelect(tabelaAutores, "cpf", autor.cpf);
         await livros_autores.cadastrarLivroAutor(autorRef[0].id, idLivro);
     }
 }
 
 async function deletarLivro(livroIsbn) {
-    const livro = await crud.returnSelect("Livros", "isbn", livroIsbn);
-    const livroDeletado = await crud.remove("Livros", livro[0].id);
+    const livro = await crud.returnSelect(tabelaLivros, "isbn", livroIsbn);
+    const livroDeletado = await crud.remove(tabelaLivros, livro[0].id);
 
-    const listaAutores = await crud.returnSelect("Livros_Autores", "livros_id", livro[0].id);
+    const listaAutores = await crud.returnSelect(tabelaLivrosAutores, "livros_id", livro[0].id);
 
     for (let autor of listaAutores) {
-        await crud.remove("Livros_Autores", autor.id);
+        await crud.remove(tabelaLivrosAutores, autor.id);
     }
 
     return livroDeletado;

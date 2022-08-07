@@ -34,14 +34,16 @@ async function cadastrarLocacao(locacao) {
 }
 
 async function clienteTemLocacao(cliente) {
-    console.log("cliente: ", cliente)
+    // console.log("cliente: ", cliente)
     const locacoes = await crud.returnSelect("Locacoes", "clientes_id", cliente.id);
-    console.log("dados locacoes: ", locacoes);
+    // console.log("dados locacoes: ", locacoes);
     for (let locacao of locacoes) {
         if (locacao.status == "ABERTO") {
+            console.log("if true locações")
             return true;
         }
     }
+    console.log("if false locações")
     return false;
 }
 
@@ -52,27 +54,32 @@ async function veriricarLivrosAlugaveis(listaLivros) {
         const livro = await crud.returnSelect("Livros", "isbn", livroIsbn.isbn);
         console.log("livro: ", livro);
 
-        console.log("Livroid: ", livro[0].id)
         const livros_locacoes = await crud.returnSelect("Livros_Locacoes", "livros_id", livro[0].id);
         console.log("livros_locacoes: ", livros_locacoes);
 
-        let livroEstaAlugado = false;
-
-        for (let livro_locacao of livros_locacoes) {
-            const locacao = await crud.getById("Locacoes", livro_locacao.locacoes_id);
-            console.log("livro_locacao.locacoes_id", livro_locacao.locacoes_id);
-            console.log("locacao: ", locacao);
-
-            if (locacao.status == "ABERTO")
-                livroEstaAlugado = true;
-        }
-
-        if (!livroEstaAlugado) {
+        if (!(await livroEstaAlugado(livros_locacoes))) {
             livrosAlugaveis.push(livro[0]);
         }
     }
 
     return livrosAlugaveis;
+}
+
+async function livroEstaAlugado(livros_locacoes) {
+    let livroEstaAlugado = false;
+
+    for (let livro_locacao of livros_locacoes) {
+        console.log("for livros_locacoes");
+        console.log(livro_locacao);
+        const locacao = await crud.getById("Locacoes", livro_locacao.locacoes_id);
+        console.log("livro_locacao.locacoes_id", livro_locacao.locacoes_id);
+        console.log("locacao: ", locacao);
+
+        if (locacao.status == "ABERTO")
+            livroEstaAlugado = true;
+    }
+
+    return livroEstaAlugado;
 }
 
 module.exports = {

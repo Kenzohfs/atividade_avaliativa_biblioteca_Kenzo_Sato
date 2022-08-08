@@ -26,6 +26,12 @@ async function buscarLivro(isbn) {
 }
 
 async function cadastrarLivro(livro) {
+    if (!(livro.isbn && livro.titulo && livro.editoras_cnpj && livro.lista_autores))
+        return { erro: `Para cadastrar um livro é preciso que tenha um ISBN, título e CNPJ da editora e uma lista de autores!` }
+
+    if (!(await isbnValido(livro.isbn)))
+        return { erro: `ISBN inválido!` }
+
     const autores = livro.lista_autores;
     const novoLivro = await fazerNovoLivro(livro);
 
@@ -34,6 +40,14 @@ async function cadastrarLivro(livro) {
     await cadastrarLivroAutor(autores, livroSalvo.id);
 
     return livroSalvo;
+}
+
+async function isbnValido(isbn) {
+    const livros = await crud.returnSelect(tabelaLivros, "isbn", isbn);
+    
+    if (livros.length == 0) 
+        return true;
+    return false;
 }
 
 async function fazerNovoLivro(livro) {

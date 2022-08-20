@@ -20,19 +20,22 @@ async function buscarLocacao(id) {
     const cliente = await crud.getById(tabelaClientes, locacao.clientes_id);
 
     delete locacao.clientes_id;
-    
+
     const livros = [];
 
     for (let livroLocacaoDado of livrosLocacoesDados)
         livros.push(await crud.getById(tabelaLivros, livroLocacaoDado.livros_id));
 
-    return {id, cliente, ...locacao, livros};
+    return { id, cliente, ...locacao, livros };
 }
 
 async function cadastrarLocacao(locacao) {
     const clientes = await crud.returnSelect(tabelaClientes, "cpf", locacao.clientes_cpf);
     delete locacao.clientes_cpf;
 
+    if (clientes.length == 0)
+        return { erro: `Cliente inválido!` }
+        
     if (await clienteTemLocacao(clientes[0]))
         return { erro: `O cliente ${clientes[0].nome} já tem um aluguel em andamento!` };
 
@@ -42,6 +45,9 @@ async function cadastrarLocacao(locacao) {
 
     const listaLivros = locacao.lista_livros;
     delete locacao.lista_livros;
+
+    if (await livrosInvalido(listaLivros))
+        return { erro: `Há livros inválidos!` }
 
     const livrosAlugaveis = await veriricarLivrosAlugaveis(listaLivros);
 
@@ -56,6 +62,15 @@ async function cadastrarLocacao(locacao) {
     return locacaoSalva;
 }
 
+async function livrosInvalido(listaLivros) {
+    for (let livro of listaLivros) {
+        let livroDado = await crud.returnSelect(tabelaLivros, "isbn", livro.isbn);
+        if (livroDado.length == 0)
+            return true;
+    }
+    return false;
+}
+
 async function atualizarLocacao(id, status) {
     const locacao = await crud.getById(tabelaLocacoes, id);
     locacao.status = status;
@@ -65,9 +80,9 @@ async function atualizarLocacao(id, status) {
 
 async function clienteTemLocacao(cliente) {
     const locacoes = await crud.returnSelect(tabelaLocacoes, "clientes_id", cliente.id);
-    
+
     for (let locacao of locacoes) {
-        if (locacao.status == statusAberto ) {
+        if (locacao.status == statusAberto) {
             return true;
         }
     }
@@ -96,7 +111,7 @@ async function livroEstaAlugado(livros_locacoes) {
     for (let livro_locacao of livros_locacoes) {
         const locacao = await crud.getById(tabelaLocacoes, livro_locacao.locacoes_id);
 
-        if (locacao.status == statusAberto )
+        if (locacao.status == statusAberto)
             livroEstaAlugado = true;
     }
 
@@ -106,7 +121,7 @@ async function livroEstaAlugado(livros_locacoes) {
 async function deletarLocacao(id) {
     const livros_locacoes = await crud.returnSelect(tabelaLivrosLocacoes, "locacoes_id", id);
 
-    for (let livro_locacao of livros_locacoes) 
+    for (let livro_locacao of livros_locacoes)
         await livrosLocacoes.deletarLivroLocacao(livro_locacao.id);
 
     return await crud.remove(tabelaLocacoes, id);

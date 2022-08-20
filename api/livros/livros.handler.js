@@ -35,11 +35,26 @@ async function cadastrarLivro(livro) {
     const autores = livro.lista_autores;
     const novoLivro = await fazerNovoLivro(livro);
 
+    if (await autoresInvalido(autores))
+        return { erro: `Há algum autor inválido!` }
+
+    if (novoLivro.editoras_id == null)
+        return { erro: `Editora inválida!` }
+
     const livroSalvo = await crud.save(tabelaLivros, null, novoLivro);
 
     await cadastrarLivroAutor(autores, livroSalvo.id);
 
     return livroSalvo;
+}
+
+async function autoresInvalido(listaAutores) {
+    for (let autor of listaAutores) {
+        let autorDado = await crud.returnSelect(tabelaAutores, "cpf", autor.cpf);
+        if (autorDado.length == 0)
+            return true;
+    }
+    return false;
 }
 
 async function isbnValido(isbn) {
@@ -80,6 +95,7 @@ async function atualizarLivro(isbn, livro) {
 
 async function buscarEditoraId(editoraCnpj) {
     const editoraDado = await crud.returnSelect(tabelaEditoras, "cnpj", editoraCnpj);
+
     return editoraDado[0].id;
 }
 
